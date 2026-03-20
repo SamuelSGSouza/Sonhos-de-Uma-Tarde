@@ -686,6 +686,19 @@ def define_final(player):
             "Nenhum lado venceu.\n" 
             "Apenas repetiram o erro.\n"
         )
+    else:
+        
+        Titulo = "Dois Lados da Mesma Ruína"
+        Final = (
+            "Pela primeira vez, você ouviu ambos os lados.\n"
+            "O orc caído. O líder da horda. Histórias de escassez, crianças famintas, promessas quebradas e uma guerra que não começou por escolha, mas por desespero.\n"
+            "Eles não eram monstros.\n"
+            "E isso tornava tudo pior.\n"
+            "Quando o fim chegou, não houve ódio nos olhos que o encaravam — apenas resignação. O ataque não era pessoal. Era inevitável.\n"
+            "Enquanto a vida escapava, você percebeu a cruel simetria: humanos protegendo o que têm, orcs lutando pelo que precisam.\n"
+            "Nenhum lado venceu.\n" 
+            "Apenas repetiram o erro.\n"
+        )
     return {
        "titulo": Titulo,
         "texto": Final

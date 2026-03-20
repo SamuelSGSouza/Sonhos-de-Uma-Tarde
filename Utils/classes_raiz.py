@@ -350,6 +350,7 @@ class Character(pygame.sprite.Sprite):
         self.team_members = team_members
         self.death_time = None
         self.delete_sprites_on_death = False
+        self.respawnable = False
         self.encerrou_conversa = False
         self.talks = {
             "1": {  # Introdução
@@ -655,13 +656,23 @@ class Character(pygame.sprite.Sprite):
             if not self.death_time:
                 self.death_time = pygame.time.get_ticks()
 
-            if self.delete_sprites_on_death:
+            if self.respawnable:
                 self.hp = self.max_hp
                 self.is_dead = False
-                self.rect.center = choice(self.spawn_points)
+                self.is_dying = False
+                center = choice(self.spawn_points)
+                self.rect.center = center
+                self.hitbox.center = center
+                self.action="Idle"
+                self.attacking_character = None
+
+
+            elif self.delete_sprites_on_death:
+                
 
                 self.kill()
                 del self
+            
             return
         
         if self.is_dying:

@@ -382,7 +382,7 @@ class Slime(Monster):
         self.brain = SlimeBrain(self)
         self.specie = "SLIME"
         self.can_talk = False
-
+        self.respawnable = True
     def __str__(self):
         return self.personal_name
     
@@ -776,7 +776,7 @@ class ChiefOrc(Monster):
                 "1": {  # Introdução
                     "fala": (
                         "Seja bem-vindo a Skarrfrost, terra dos orcs do gelo.\n "
-                        "Eu sou Ghorak, chefe desta região. \nEm chão orc você deve ser direto e assertivo. \n"
+                        "Eu sou Traurig, chefe desta região. \nEm chão orc você deve ser direto e assertivo. \n"
                         "Então, viajante, diga logo o que veio fazer aqui."
                     ),
                     "respostas": {
@@ -868,7 +868,7 @@ class ChiefOrc(Monster):
                             "next_id": "4_diplomacia"
                         },
 
-                        # Ghorak testa a convicção
+                        # traurig testa a convicção
                         "Não vim salvar humanos. Vim evitar mortes inúteis.": {
                             "pontuacao": 0.6,
                             "next_id": "4_respeito"
@@ -902,7 +902,7 @@ class ChiefOrc(Monster):
                         },
 
                         # Insiste no misticismo → erro
-                        "O inverno escolheu você, Ghorak.": {
+                        "O inverno escolheu você, Traurig.": {
                             "pontuacao": -0.6,
                             "next_id": "end_negativo"
                         },
@@ -1024,7 +1024,7 @@ class ChiefOrc(Monster):
         self.reputacao_orcs = 0.0  # Variável global do jogo, ex: de -1.0 a +1.0
         self.can_talk = True
 
-        self.personal_name = "Ghorak"
+        self.personal_name = "Traurig"
 
     def processa_escolha(self, escolha: str):
         if escolha == "None":
@@ -1046,7 +1046,7 @@ class ChiefOrc(Monster):
     
 
     def __str__(self):
-        return "Ghorak"
+        return "Traurig"
     
 class Orc(Monster):
     def __init__(self, *groups, collision_sprites, creatures_sprites, monster_name="Orc", house_point=(0, 0), initial_position, boss_chance=20, creature_images):
@@ -1271,7 +1271,7 @@ class OrcGuarda(Monster):
         original_speed = 120
         default_character_size = DCS
 
-        max_hp = 25
+        max_hp = 60
         attack_damage = 10
 
         
@@ -1398,6 +1398,7 @@ class Goblin(Monster):
         self.brain = SlimeBrain(self)
         self.specie = "GOBLIN"
         self.can_talk = False
+        self.respawnable = True
 
     def __str__(self):
         return self.personal_name

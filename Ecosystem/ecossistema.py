@@ -77,7 +77,7 @@ class Map:
         
         getable_objects_layer =  self.map.get_layer_by_name("Trees")
         for obj in getable_objects_layer:
-            surface = pygame.transform.scale(obj.image, (obj.image.width*SCALE, obj.image.height*SCALE)).convert_alpha()
+            surface = pygame.transform.scale(obj.image, (obj.image.width*SCALE*1.5, obj.image.height*SCALE*1.5)).convert_alpha()
             CollisionSprites(all_sprites, collision_sprites, pos=(obj.x*SCALE, obj.y*SCALE), surface=surface, item=Jar(all_sprites, collision_sprites,surface), is_tree=True)
         
         getable_objects_layer =  self.map.get_layer_by_name("Roof")

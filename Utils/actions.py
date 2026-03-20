@@ -101,7 +101,7 @@ class Brain:
             for creature in proximos: 
                 if creature != self.character:
                     if creature.specie == self.character.specie:
-                        if creature.is_player :
+                        if creature.is_player or creature.is_dead:
                             return None
                         if self.character.now - self.character.last_talk_time > self.character.talk_delay and self.character.can_talk == True and self.character.scripts:
                             self.character.last_talk_time = self.character.now
@@ -316,12 +316,20 @@ class MonsterBrain(Brain):
         super().__init__(character)
         self.can_attack =True
 
+    def rotina_diaria(self):
+        if self.character.get_hour() >10:
+            points = [(3299, 518), (3400, 135)]
+            if not self.final_dest:
+                self.final_dest = choice(points)
+        return super().rotina_diaria()
+
 class SlimeBrain(MonsterBrain):
     def __init__(self, character):
         super().__init__(character)
 
     
     def rotina_diaria(self):
+        super().rotina_diaria()
         if not self.final_dest:
             self.final_dest = choice(self.character.locais_favoritos)
 
@@ -391,16 +399,30 @@ class NinaBrain(Brain):
         self.can_attack = can_attack
         self.target = None
         self.final_dest = ()
+        self.primeiro_acompanhamento = True
 
     def rotina_diaria(self):
-        hora = self.character.get_hour()
-        if hora < 17:
+
+        if self.character.acompanhar_player:
+            if self.primeiro_acompanhamento:
+                self.final_dest = None
+                self.primeiro_acompanhamento = False
             if not self.final_dest:
-                self.final_dest = choice(self.character.locais_montanha)
+                self.final_dest = self.character.player.rect.center
+            move = self.move_to(self.final_dest)
+            if self.character.player.rect.colliderect(self.character.village_rect):
+                self.character.acompanhar_player = False
+                self.character.ficar_vila = True
+                self.character.player.salvou_nina = True
         else:
-            if not self.final_dest:
-                self.final_dest = choice(self.character.locais_patrulha)
-        move = self.move_to(self.final_dest)
+            hora = self.character.get_hour()
+            if hora < 12 and not self.character.ficar_vila:
+                if not self.final_dest:
+                    self.final_dest = choice(self.character.locais_montanha)
+            else:
+                if not self.final_dest:
+                    self.final_dest = choice(self.character.locais_patrulha)
+            move = self.move_to(self.final_dest)
         return move
 
 class PessoaAlavancaBrain(Brain):
@@ -471,23 +493,31 @@ class LaRochBrothers(Brain):
         self.target = None
     
     def rotina_diaria(self):
-        vr = self.character.village_rect #village rect
-        if not self.final_dest:
-            hora = self.character.get_hour()
-            if hora >19:
-                self.final_dest = (vr.right, vr.top)
+        hora = self.character.get_hour()
+        if self.character.soube_ataque:
+            pass
+        else:
+            if hora < 11:
+            
+                vr = self.character.village_rect #village rect
+                if not self.final_dest:
+                    hora = self.character.get_hour()
+                    if hora >19:
+                        self.final_dest = (vr.right, vr.top)
+                    else:
+                        self.final_dest = ()
+                        for _ in range(20):
+                            self.final_dest = (randint(0, vr.right), randint(vr.top, 6000))
+
+                            if not (self.final_dest[0] < 460+1500 and self.final_dest[1] > 4358+1500):
+                                break
+
+                        if self.character.team_members != None:
+                            for team_member in self.character.team_members:
+                                team_member.brain.final_dest = self.final_dest
             else:
-                self.final_dest = ()
-                for _ in range(20):
-                    self.final_dest = (randint(0, vr.right), randint(vr.top, 6000))
-
-                    if not (self.final_dest[0] < 460+1500 and self.final_dest[1] > 4358+1500):
-                        break
-
-                if self.character.team_members != None:
-                    for team_member in self.character.team_members:
-                        team_member.brain.final_dest = self.final_dest
-        
+                if not self.final_dest:
+                    self.final_dest = (1201, 5311)
 
         move = self.move_to(self.final_dest)
         return move
@@ -559,6 +589,11 @@ class HolzBrain(Brain):
         self.arvore_destino = None
     
     def rotina_diaria(self):
+        if self.character.ir_procurar_nina:
+            if not self.final_dest:
+                self.final_dest = self.character.NINA.rect.center
+            return self.move_to(self.final_dest)
+        
         if self.iniciar_corte == True:
             self.character.action = "Attack_1"
             dist = (self.character.position_vector - pygame.Vector2(self.final_dest)).length()
@@ -578,6 +613,8 @@ class HolzBrain(Brain):
                 self.momento_inicio_corte = None
                 self.iniciar_corte = False
                 self.final_dest = None
+                if self.character.espera_ajuda_player:
+                    self.character.cortou_uma_arvore = True
                 return Idle(self.character)
             return Idle(self.character)
         

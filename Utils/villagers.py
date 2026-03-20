@@ -924,377 +924,93 @@ class Nina(Villager):
         super().__init__(*groups, collision_sprites=collision_sprites, creatures_sprites=creatures_sprites, npc_name=npc_name, house_point=house_point, is_ranged=is_ranged, attack_hitbox_list=attack_hitbox_list, range_distance=range_distance, default_size=default_size, team_members=team_members, original_speed=original_speed, actions_to_add=actions_to_add, )
         self.encontrou_player = False
         self.player = player
-        
+        self.max_hp=20
+        self.hp= 20
         #Falas loop 1
         self.talks = {
             "1": {  # Encontro inicial com Nina
-                "fala": "Oi. Você não é daqui, é?",
+                "fala": "Está perdido, viajante?",
                 "respostas": {
-                    "Não. Cheguei hoje.": {"pontuacao": 0, "next_id": "2"},
-                    "Não sou, não.": {"pontuacao": 0, "next_id": "2"},
-                    "Oi.": {"pontuacao": 0, "next_id": "end_curto"}
+                    "Talvez um pouco. ": {"pontuacao": 0, "next_id": "rota_1_1"},
+                    "Acho que estou exatamente onde eu deveria estar.": {"pontuacao": 0, "next_id": "rota_2_1"},
+                    "#1 Na verdade, estou aqui pra te tirar dessa montanha": {"pontuacao": 0, "next_id": "rota_secreta_1"},
                 }
             },
-            "2": {  
-                "fala": "Eu sei que você não é. Conheço todo mundo que mora aqui no vale. (sorriso)",
+            "rota_secreta_1": { 
+                "fala": "O que? Do que está falando?",
                 "respostas": {
-                    "Onde eu estou?": {"pontuacao": 0, "next_id": "2_vale"},
+                    "Se ficar aqui, você vai morrer. ": {"pontuacao": 0, "next_id": "rota_secreta_1_1"},
+                    "#2 Está acontecendo uma movimentação estranha dos Orcs no vale. Isso está assustando os monstros e todos eles estão fugindo para cá": {"pontuacao": 0, "next_id": "end_acompanhar"},
                 }
             },
-            "2_vale": {  
-                "fala": "Bem vindo viajante, ao Vale do Retorno! Só não sei por que chamam assim, já que todo mundo que vai embora nunca quer voltar...",
+            "rota_secreta_1_1": { 
+                "fala": "Isso é algum tipo de ameaça?",
                 "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "2_conversa"},
+                    "Escuta, não dá tempo de explicar. Eu preciso que você venha comigo agora mesmo. ": {"pontuacao": 0, "next_id": "end_ficar"},
+                    "#3 Nina, eu estou aqui para te ajudar. Precisamos ir agora!": {"pontuacao": 0, "next_id": "end_acompanhar"},
+                }
+            },
+            "rota_1_1": {  
+                "fala": "Bom, pra começar, você está no Vale do Retorno, o vale mais ao norte do continente! Você veio aqui pelo Coração do Inverno, certo?",
+                "respostas": {
+                    "Isso mesmo! Você sabe algo sobre ele?": {"pontuacao": 0, "next_id": "rota_1_2"},
+                    "Esse 'Coração do Inverno', o que é?": {"pontuacao": 0, "next_id": "rota_1_2"},
+                }
+            },
+            "rota_1_2": {  
+                "fala": "'O Coração do Inverno' é uma jóia com poderes lendários, que dizem ser a fonte das grandes nevascas que acontecem em todo o norte do continente. A lenda conta que aquele que o possuir pode não apenas governas todas as terras de gelo, mas também realizar um único desejo de proporções ilimitadas.",
+                "respostas": {
+                    "Entendo... Mas não é por isso que estou aqui.": {"pontuacao": 0, "next_id": "end_1"},
+                    "Fale mais, por favor.": {"pontuacao": 0, "next_id": "rota_1_3"},
+                }
+            },
+            "rota_1_3": {  
+                "fala": "Os viajantes que vem sempre dizem que o Coração deve estar por aqui, mas já procuraram em todo o vale e nunca encontraram. Nos últimos anos tem aparecido cada vez menos gente procurando",
+                "respostas": {
+                    "E quanto a você? Acha que ele existe e está escondido nesse vale?": {"pontuacao": 0, "next_id": "rota_1_4"},
+                    "Eu não sou como eles, pode apostar que eu vou encontrar o Coração!": {"pontuacao": 0, "next_id": "end_1"},
+                }
+            },
+            "rota_1_4": {  
+                "fala": "Sendo bem honesta, viajante, acho que são só histórias que alguém espalhou por aí e todos passaram a acreditar. Vivi minha vida inteira nesse vale, vi inúmeros caçadores de recompensa e viajantes vagarem por aqui tentando encontrar esse Coração e todos eles sempre iam embora com decepção e cansaço em seu olhar... Então não, acredito que essa jóia não existe. E se ela existe, ela não está aqui.",
+                "respostas": {
+                    "Entendo...Agradeço pelas informações! Mesmo assim, pretendo gastar um pouco de tempo procurando por ela.": {"pontuacao": 0, "next_id": "end_1"},
+                    "Agradeço pelas informações! Só mais uma coisa, pode me dizer seu nome?": {"pontuacao": 0, "next_id": "end_2"},
+                }
+            },
+            "rota_2_1": {  
+                "fala": "Você é algum tipo de estudioso ou pesquisador? O último viajante que passou por aqui falando assim foi um elfo junto com um bando de guarda-costas.",
+                "respostas": {
+                    "O que aconteceu com esse elfo?": {"pontuacao": 0, "next_id": "rota_2_2"},
+                    "Esse estudioso viajante descobriu alguma coisa?": {"pontuacao": 0, "next_id": "rota_1_3"},
+                }
+            },
+            "rota_2_2": {  
+                "fala": "Ele e os ajudantes foram para a floresta dos fantasmas, falando que o Coração TINHA que estar lá. Isso já faz alguns dias e ele ainda não retornou, então acho que deve ter morrido por lá.",
+                "respostas": {
+                    "Esse 'Coração', o que ele é?": {"pontuacao": 0, "next_id": "rota_1_2"},
+                    "Me pergunto se ele realmente existe...": {"pontuacao": 0, "next_id": "rota_1_3"},
                 }
             },
 
-            "2_conversa": {
-                "fala": "Eu fico aqui de manhã. Dá pra ver o vale inteiro daqui.",
-                "respostas": {
-                    "O que você está vendo agora?": {"pontuacao": 0, "next_id": "5"},
-                    "É um bom lugar.": {"pontuacao": 0, "next_id": "3"}
-                }
-            },
 
-            "3": {
-                "fala": "Quando alguém passa correndo, eu imagino pra onde está indo.",
-                "respostas": {
-                    "E pra onde você acha que eu estou indo?": {"pontuacao": 0, "next_id": "4"},
-                    "Você parece gostar daqui.": {"pontuacao": 0, "next_id": "5"},
-                    "Faz sentido.": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "4": {
-                "fala": "Você? Ainda não sei.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "5": {  
-                "fala": "Hoje todo mundo parece agitado. É estranho.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-
-            "6": {
-                "fala": "Mas logo passa.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "end"}
-                }
-            },
-
-            "end": {
-                "fala": "Boa sorte… hoje",
+            "end_1": {  
+                "fala": "Bom, seja como for, se passar pela vila não se esqueça de contratar os serviços do lenhador. Ele é o melhor no que faz.",
                 "respostas": {}
             },
-            "end_curto": {
-                "fala": "Oi.",
-                "respostas": {}
-            }
-        }
-
-        self.talks_loop_2 = {
-            "1": {  # Encontro inicial com Nina
-                "fala": "Oi. Você não é daqui, é?",
-                "respostas": {
-                    "Não. Cheguei hoje.": {"pontuacao": 0, "next_id": "2"},
-                    "Não sou, não.": {"pontuacao": 0, "next_id": "2"},
-                    "Oi.": {"pontuacao": 0, "next_id": "end_curto"}
-                }
-            },
-            "2": {  
-                "fala": "Eu sei que você não é. Conheço todo mundo que mora aqui no vale.",
-                "respostas": {
-                    "Onde eu estou?": {"pontuacao": 0, "next_id": "2_vale"},
-                    "É, imaginei que você soubesse.": {"pontuacao": 0, "next_id": "2_conversa"},
-                }
-            },
-            "2_vale": {  
-                "fala": "Vale do Retorno. Nome estranho, né? Quase ninguém volta",
-                "respostas": {
-                    "Você ficaria surpresa.": {"pontuacao": 0, "next_id": "2_conversa"},
-                }
-            },
-
-            "2_conversa": {
-                "fala": "Eu fico aqui de manhã. Gosto de olhar tudo antes de ficar cheio.",
-                "respostas": {
-                    "Está vendo alguma coisa estranha agora?": {"pontuacao": 0, "next_id": "5_quieto"},
-                    "É um bom lugar.": {"pontuacao": 0, "next_id": "3"}
-                }
-            },
-
-            "3": {
-                "fala": "Quando alguém passa correndo, eu fico pensando se já vi isso antes.",
-                "respostas": {
-                    "... E o que você tem a dizer sobre mim?": {"pontuacao": 0, "next_id": "4"},
-                    "...": {"pontuacao": 0, "next_id": "5"},
-                }
-            },
-
-            "4": {
-                "fala": "Você… parece meio confuso.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "5_quieto": {  
-                "fala": "Eu vi um orc entrando no labirinto da floresta mas ele ainda não saiu. Foi bem estranho.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-            "5": {  
-                "fala": "Sabe, hoje todo mundo está mais agitado que o normal. Isso me dá um frio na barriga.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5_quieto"}
-                }
-            },
-
-            "6": {
-                "fala": "Mas deve ser só impressão.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "end"}
-                }
-            },
-
-            "end": {
-                "fala": "Boa sorte hoje.",
+            "end_2": {  
+                "fala": "Meu nome? He he...  Eu sou a Nina, muito prazer viajante! Quando passar pela vila não se esqueça de contratar os serviços do meu pai. Ele é o Holz, lenhador da vila.",
                 "respostas": {}
             },
-            "end_curto": {
-                "fala": "Oi.",
-                "respostas": {}
-            }
-        }
-
-        self.talks_loop_3 = {
-            "1": {  # Encontro inicial com Nina
-                "fala": "Oi… você voltou?",
-                "respostas": {
-                    "Você me conhece?": {"pontuacao": 0, "next_id": "2"},
-                    "Voltei... Sabe quem eu sou?": {"pontuacao": 0, "next_id": "2"},
-                    "Oi.": {"pontuacao": 0, "next_id": "end_curto"}
-                }
-            },
-            "2": {  
-                "fala": "Desculpa. Achei que já tinha te visto antes.",
-                "respostas": {
-                    "Onde eu estou?": {"pontuacao": 0, "next_id": "2_vale"},
-                }
-            },
-            "2_vale": {  
-                "fala": "Vale do Retorno. Nome estranho, né? Quase ninguém volta",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "2_conversa"},
-                }
-            },
-
-            "2_conversa": {
-                "fala": "Eu fico aqui de manhã. Alguém sempre passa por aqui cedo.",
-                "respostas": {
-                    "O que você vê daí?": {"pontuacao": 0, "next_id": "5_quieto"},
-                    "É um bom lugar.": {"pontuacao": 0, "next_id": "3"}
-                }
-            },
-
-            "3": {
-                "fala": "Quando alguém corre, eu tento lembrar de onde conheço o passo.",
-                "respostas": {
-                    "Você reconhece os meus?": {"pontuacao": 0, "next_id": "4"},
-                    "Você parece gostar daqui.": {"pontuacao": 0, "next_id": "5"},
-                    "Faz sentido.": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "4": {
-                "fala": "Um pouco... Como se eu já tivesse ouvido antes.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "5_quieto": {  
-                "fala": "Hoje tá agitado… de novo.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-            "5": {  
-                "fala": "Hoje tá agitado… de novo.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-
-            "6": {
-                "fala": "Não gosto quando fica assim.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "end"}
-                }
-            },
-
-            "end": {
-                "fala": "Se cuida hoje.",
+            "end_acompanhar": {  
+                "fala": "Com você sa- Não, tudo bem. Eu vou com você!",
                 "respostas": {}
             },
-            "end_curto": {
-                "fala": "Oi.",
-                "respostas": {}
-            }
-        }
-        
-        self.talks_loop_4 = {
-            "1": {  # Encontro inicial com Nina
-                "fala": "Você chegou cedo hoje.",
-                "respostas": {
-                    "Você me conhece?": {"pontuacao": 0, "next_id": "2"},
-                    "Cheguei... Sabe quem eu sou?": {"pontuacao": 0, "next_id": "2"},
-                    "Oi.": {"pontuacao": 0, "next_id": "end_curto"}
-                }
-            },
-            "2": {  
-                "fala": "Conheço todo mundo daqui… menos você. Ainda.",
-                "respostas": {
-                    "Onde eu estou?": {"pontuacao": 0, "next_id": "2_vale"},
-                }
-            },
-            "2_vale": {  
-                "fala": "Vale do Retorno. Talvez o nome faça sentido pra alguns.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "2_conversa"},
-                }
-            },
-
-            "2_conversa": {
-                "fala": "De manhã tudo parece possível.",
-                "respostas": {
-                    "Como estão as coisas hoje?": {"pontuacao": 0, "next_id": "5_quieto"},
-                    "Você é esperta. Tem alguma coisa pra dizer pra mim?": {"pontuacao": 0, "next_id": "3"}
-                }
-            },
-
-            "3": {
-                "fala": "Quando alguém corre, geralmente já tá atrasado.",
-                "respostas": {
-                    "E o que tem a dizer sobre mim?": {"pontuacao": 0, "next_id": "4"},
-                    "Tem razao...": {"pontuacao": 0, "next_id": "5"},
-                }
-            },
-
-            "4": {
-                "fala": "Você não devia ficar parado.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "5_quieto": {  
-                "fala": "Hoje tá agitado… de novo.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-            "5": {  
-                "fala": "Hoje tá agitado… de novo.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-
-            "6": {
-                "fala": "Não gosto quando fica assim.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "end"}
-                }
-            },
-
-            "end": {
-                "fala": "Se cuida hoje.",
+            "end_ficar": {  
+                "fala": "Eu não sei quem, ou o que você é, então não vou a lugar nenhum com você!",
                 "respostas": {}
             },
-            "end_curto": {
-                "fala": "Oi.",
-                "respostas": {}
-            }
-        }
 
-        self.talks_loop_5 = {
-            "1": {  # Encontro inicial com Nina
-                "fala": "Ah… é você.",
-                "respostas": {
-                    "Você me conhece?": {"pontuacao": 0, "next_id": "2"},
-                    "Sim... Sou eu.": {"pontuacao": 0, "next_id": "2"},
-                    "Oi.": {"pontuacao": 0, "next_id": "end_curto"}
-                }
-            },
-            "2": {  
-                "fala": "Você sempre aparece quando o vale tá assim.",
-                "respostas": {
-                    "O que quer dizer?": {"pontuacao": 0, "next_id": "2_vale"},
-                }
-            },
-            "2_vale": {  
-                "fala": "Vale do Retorno. Alguns voltam porque precisam.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "2_conversa"},
-                }
-            },
-
-            "2_conversa": {
-                "fala": "Eu fico aqui de manhã. Depois disso… não gosto.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5_quieto"},
-                    "Vai dar tudo certo dessa vez.": {"pontuacao": 0, "next_id": "3"}
-                }
-            },
-
-            "3": {
-                "fala": "Você sabe pra onde tá indo. Dá pra ver.",
-                "respostas": {
-                    "Dessa vez eu sei.": {"pontuacao": 0, "next_id": "5_quieto"},
-                }
-            },
-
-            "4": {
-                "fala": "Você não devia ficar parado.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-
-            "5_quieto": {  
-                "fala": "Hoje tá agitado demais.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "5"}
-                }
-            },
-            "5": {  
-                "fala": "Quando fica assim… algo já foi decidido.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "6"}
-                }
-            },
-
-            "6": {
-                "fala": "Não gosto quando fica assim.",
-                "respostas": {
-                    "...": {"pontuacao": 0, "next_id": "end"}
-                }
-            },
-
-            "end": {
-                "fala": "Não chega tarde.",
-                "respostas": {}
-            },
-            "end_curto": {
-                "fala": "Oi.",
-                "respostas": {}
-            }
         }
 
         self.locais_patrulha = []
@@ -1304,180 +1020,184 @@ class Nina(Villager):
         vr_bottom = 1075
         vr = self.village_rect #village rect
         matriz_mundo = self.groups()[0].world_matriz
-
+        self.acompanhar_player = False
         self.locais_patrulha = []
-        self.locais_montanha = []
-
-        for _ in range(0,200):
-            x, y = randint(vr_left, vr_right), randint(vr_top, vr_bottom)
-            if matriz_mundo[x//GRID_SIZE][y//GRID_SIZE] != 1 and (x,y) not in self.locais_patrulha:
-                self.locais_montanha.append((x,y))
-
+        self.locais_montanha = [(3299, 518), (3400, 135)]
+        self.ficar_vila = False
         for _ in range(0,200):
             x, y = randint(vr.left, vr.right), randint(vr.top, vr.bottom)
             if matriz_mundo[x//GRID_SIZE][y//GRID_SIZE] != 1 and (x,y) not in self.locais_patrulha:
                 self.locais_patrulha.append((x,y))
 
     def escolhe_fala(self, ):
+        self.player.falou_nina = True
 
-        loop = self.player.loop
-
-        falas = {
-            1: self.talks,
-            2: self.talks_loop_2,
-            3: self.talks_loop_3,
-            4: self.talks_loop_4,
-            5: self.talks_loop_5,
-        }
-        if loop not in falas.keys():
-            loop = choice(list(falas.keys()))
-
-        self.talks = falas[loop]
-
-        fala_data = falas[loop].get(self.current_id)
+        fala_data = self.talks.get(self.current_id)
         if not fala_data:
             return "", []
         
+        if self.current_id == "end_acompanhar":
+            self.acompanhar_player = True
+        
+        if self.current_id == "end_2":
+            self.player.sabe_nome_nina=True
+
         # Verifica se é fim (sem respostas) e aplica reputação
         if not fala_data["respostas"]:
             delta_rep = self.pontuacao * 20  # Exemplo: pontuação alta -> +rep, baixa -> -rep
             return fala_data["fala"], []  # Mostra fala final e encerra
         
-        return fala_data["fala"], list(fala_data["respostas"].keys())
+        respostas = self.player.verifica_respostas(list(fala_data["respostas"].keys()))
+        return fala_data["fala"], respostas
 
 class Dash(Villager):
-    def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Nina", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[]):
+    def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Nina", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[], player=None):
         super().__init__(*groups, collision_sprites=collision_sprites, creatures_sprites=creatures_sprites, npc_name=npc_name, house_point=house_point, is_ranged=is_ranged, attack_hitbox_list=attack_hitbox_list, range_distance=range_distance, default_size=default_size, team_members=team_members, original_speed=original_speed, actions_to_add=actions_to_add)
-
+        self.player = player
         self.talks = {
         "1": {  # Introdução
-            "fala": "Ei, estranho... Eu sou Dash, caçador da vila. Estou abatendo alguns monstros nas redondezas. Você parece saber se virar... Ajuda na caçada?",
+            "fala": "Salve viajante, está perdido?",
             "respostas": {
-                "Claro, vamos caçar juntos. Posso ajudar com minha habilidade.": {"pontuacao": 0.8, "next_id": "2_positiva"},
-                "Por que eu me arriscaria por uma vila que nem conheço?": {"pontuacao": -0.6, "next_id": "2_negativa"},
-                "Talvez, se houver uma recompensa envolvida.": {"pontuacao": 0.2, "next_id": "2_neutra"},
-                "Caçe sozinho, não é problema meu.": {"pontuacao": -1.0, "next_id": "end_negativo"}
+                "Olá amigo, estou apenas de passagem.  E vocês?": {"pontuacao": 0.8, "next_id": "rota_1"},
+                "Só estou procurando uma coisa, não se preocupem comigo.": {"pontuacao": -0.6, "next_id": "rota_2"},
+                "#7 É... As pessoas me perguntam muito isso por aqui": {"pontuacao": 0.2, "next_id": "rota_secreta"},
             }
         },
-        "2_positiva": {
-            "fala": "Ótimo! Um aliado confiável. Preciso de alguém pra cobrir as florestas enquanto miro com o arco. Tem armadilhas ou iscas?",
+        "rota_1": { 
+            "fala": "Eu sou o Dash e Essa é a Nash, somos os caçadores da vila. Você disse que está só de passagem, certo? Então é melhor ir embora logo, senão você pode se arrepender.",
             "respostas": {
-                "Aqui, use isso. (Fornece item)": {"pontuacao": 0.7, "next_id": "end_positivo"},
-                "Não tenho agora, mas posso rastrear pegadas.": {"pontuacao": 0.3, "next_id": "3_positiva"},
-                "Só se me der parte do couro do lobo.": {"pontuacao": -0.4, "next_id": "2_negativa"}
+                "Por que diz isso?": {"pontuacao": 0.8, "next_id": "end_conselho"},
+                "#9 Fala isso por causa das nevascas?": {"pontuacao": -0.6, "next_id": "rota_secreta_2"},
             }
         },
-        "2_negativa": {
-            "fala": "Arriscar? A vila protege viajantes como você! Egoísta... Mas se mudar de ideia, prove seu valor.",
+        "rota_secreta_1_1": { 
+            "fala": "Para ser sincero com você, também estamos tentando descobrir. Notamos uma movimentação estranha dos monstros e dos Orcs, mas ainda não temos certeza do que está acontecendo.",
             "respostas": {
-                "Desculpe, foi rude. Vamos caçar.": {"pontuacao": 0.4, "next_id": "3_neutra"},
-                "A vila que se vire sozinha!": {"pontuacao": -0.8, "next_id": "end_negativo"},
-                "Tudo bem, o que precisa exatamente?": {"pontuacao": 0.1, "next_id": "2_neutra"}
+                "#8 Eu notei que a quantidade de monstros aqui no vale está diminuindo.": {"pontuacao": 0.8, "next_id": "end_explicacao"},
+                "Espero que esteja tudo bem": {"pontuacao": -0.6, "next_id": "end_esperanca"},
             }
         },
-        "2_neutra": {
-            "fala": "Recompensa? A vila paga bem por caçadas. 20 moedas se pegarmos o lobo. Aceita?",
+        
+        "rota_secreta_1_2_2": { 
+            "fala": "Muitos anos antes disso acontecer, parece que os Orcs também tiveram um período de fartura e cresceram em número e força.\n\nEles precisavam de recursos para poder alimentar tantas bocas, então atacaram a vila humana.\n\nOs humanos receberam ajuda da capital então os Orcs foram recharçados e quase entraram em extinsão por aqui.",
             "respostas": {
-                "Aceito, e ajudo de boa vontade.": {"pontuacao": 0.5, "next_id": "end_positivo"},
-                "Faça 50 moedas e eu lidero a caçada.": {"pontuacao": -0.2, "next_id": "3_neutra"},
-                "Esquece, boa sorte sozinho.": {"pontuacao": -0.5, "next_id": "end_negativo"}
+                "Você odeia os Orcs?": {"pontuacao": 0.8, "next_id": "rota_secreta_1_2_3"},
+                "Parece um ciclo sem fim de morte e sangue": {"pontuacao": 0.8, "next_id": "rota_secreta_1_2_3"},
             }
         },
-        "3_positiva": {
-            "fala": "Apreciado. Volte quando puder; a vila valoriza aliados como você.",
+        "rota_secreta_1_2_1": { 
+            "fala": "Alguns vão dizer que foi um sucesso e que conseguimos reduzir a população de Orcs, mas a verdade é que muito sangue foi derramado dos dois lados.\n\nNão Houve vencedores.",
             "respostas": {
-                "Conte comigo. Fique seguro!": {"pontuacao": 0.4, "next_id": "end_positivo"}
+                "Isso parece uma atitude radical e cruel": {"pontuacao": 0.8, "next_id": "rota_secreta_1_2_2"},
+                "Os Orcs realmente eram uma ameaça tão grande assim?": {"pontuacao": 0.8, "next_id": "rota_secreta_1_2_2"},
             }
         },
-        "3_neutra": {
-            "fala": "50 é justo pelo risco. Vamos nessa, parceiro.",
+        "rota_secreta_1_2": { 
+            "fala": "Fico feliz que diga isso, amigo. Se fosse a alguns anos atrás você não iria querer passar nem um dia por aqui. \n\nOs Orcs estavam se reproduzindo muito rápido, então o chefe da vila na época organizou uma expedição de extermínio, por medo que eles pudessem dominar o vale.",
             "respostas": {
-                "Combinado. Vamos caçar.": {"pontuacao": 0.0, "next_id": "end_neutro"}
+                "E o que aconteceu?": {"pontuacao": 0.8, "next_id": "rota_secreta_1_2_1"},
             }
         },
-        "end_positivo": {
-            "fala": "Você é um verdadeiro herói! A vila te deve uma. Venha pra fogueira depois! (Sorri e agradece)",
+        "rota_secreta": { 
+            "fala": "Não se preocupe, amigo. Isso são apenas as pessoas daqui sendo simpáticas... ou pelo menos tentando.",
+            "respostas": {
+                "Eu agradeço por isso. Aqui parece um bom lugar para se viver.": {"pontuacao": 0.8, "next_id": "rota_secreta_1_1"},
+                "Eu agradeço por isso. Aproveitando que estamos aqui, como estão as coisas aqui no vale?": {"pontuacao": -0.6, "next_id": "rota_secreta_1_2"},
+            }
+        },
+        "rota_secreta_2": { 
+            "fala": "Ah então você já  sabe das nevascas? Claro, tem elas também, mas alguma coisa estranha está acontecendo aqui no vale. Eu e a Nash estamos tentando descobrir o que é. Estamos agora indo nos infiltrar no lar dos Orcs para ver se descobrimos alguma coisa",
+            "respostas": {
+                "Se descobrirem algo eu gostaria de saber também. Talvez eu possa ajudar com algo": {"pontuacao": 0.8, "next_id": "end_ajuda"},
+                "#10 Na verdade, eu já sei o que está acontecendo. Os Orcs estão se preparando para atacar a vila....": {"pontuacao": -0.6, "next_id": "rota_secreta_2"},
+            }
+        },
+        "rota_secreta_3": { 
+            "fala": "O que?! Como você sabe disso???",
+            "respostas": {
+                "Eu não posso te contar": {"pontuacao": 0.8, "next_id": "end_nao_confiavel"},
+                "(Falar sobre o loop)": {"pontuacao": -0.6, "next_id": "end_nao_confiavel"},
+                "Também estava preocupado com a movimentação estranha, então me infiltrei no covil deles e descobri tudo.": {"pontuacao": -0.6, "next_id": "end_confiavel"},
+            }
+        },
+        "rota_2": { 
+            "fala": "Tenha cuidado então. Esse vale é mais perigoso e traiçoeiro do que parece.",
+            "respostas": {
+                "Por que diz isso?": {"pontuacao": 0.8, "next_id": "end_conselho"},
+            }
+        },
+
+        
+        "end_conselho": {
+            "fala": "É apenas um pequeno conselho. Seguir ou não, é escolha sua.",
             "respostas": {}
         },
-        "end_negativo": {
-            "fala": "Covarde! Não volte pra vila se precisar de ajuda!",
+        "end_ajuda": {
+            "fala": "Obrigado amigo! Se descobrirmos algo, vamos te avisar também.",
             "respostas": {}
         },
-        "end_neutro": {
-            "fala": "Negócio fechado. Sem mais obrigações.",
+        "end_nao_confiavel": {
+            "fala": "Eu e a Nash já devíamos ter imaginado que os Orcs poderiam atacar depois de tudo que aconteceu, mas parece que você não vai falar a verdade sobre o que sabe, então parece que não dá pra confiar em você.",
             "respostas": {}
-        }
+        },
+        "end_confiavel": {
+            "fala": "Droga! depois do que aconteceu esse ano nós devíamos ter imaginado. Obrigado pelas informações amigo! Vamos voltar para a vila e fazer todos se prepararem.",
+            "respostas": {}
+        },
+        "end_esperanca": {
+            "fala": "É o que todos esperamos.",
+            "respostas": {}
+        },
+        "end_explicacao": {
+            "fala": "Oh... Você tem olhos de caçador, viajante. Parece que os Orcs estão se movendo de forma estranha e isso está afugentando os monstros, que estão correndo para a montanha. \n\nA intuição da Nash está dizendo que os Orcs tem alguma coisa a ver com isso, então vamos nos infiltrar na aldeia deles pra ver o que descobrimos. se descobrirmos alguma coisa a gente te avisa.",
+            "respostas": {}
+        },
+        "rota_secreta_1_2_3": { 
+            "fala": "Vivi minha vida inteira como caçador junto da minha irmã e tivemos que aprender quase tudo sozinhos.\n\nA maior lição que aprendemos foi que na natureza não existe lado certo ou errado, bom ou mal, são apenas seres lutando pela própria sobrevivência.\n\nMas admito que eu, particulamente, gostaria de poder viver em paz com os Orcs.",
+            "respostas": {}
+        },
     }
         
-        self.max_hp = randint(20,30)
+        self.hp = 30
+        self.max_hp = 30
         self.attack_damage = randint(12,20)
+        self.soube_ataque = False
+    
+    def escolhe_fala(self, ):
+        fala_data = self.talks.get(self.current_id)
+        if not fala_data:
+            return "", []
+        
+
+        # Verifica se é fim (sem respostas) e aplica reputação
+        if not fala_data["respostas"]:
+            delta_rep = self.pontuacao * 20  # Exemplo: pontuação alta -> +rep, baixa -> -rep
+            return fala_data["fala"], []  # Mostra fala final e encerra
+        
+        respostas = self.player.verifica_respostas(list(fala_data["respostas"].keys()))
+        return fala_data["fala"], respostas
+
 
 class Nash(Villager):
     def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Nina", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[]):
         super().__init__(*groups, collision_sprites=collision_sprites, creatures_sprites=creatures_sprites, npc_name=npc_name, house_point=house_point, is_ranged=is_ranged, attack_hitbox_list=attack_hitbox_list, range_distance=range_distance, default_size=default_size, team_members=team_members, original_speed=original_speed, actions_to_add=actions_to_add)
+        
+        self.max_hp = 120
+        self.hp = self.max_hp
 
         self.talks = {
             "1": {  # Introdução
-                "fala": "Você pisa leve demais pra ser só mais um viajante. Sou Nash, caçadora da vila. As trilhas estão perigosas… e eu não gosto de trabalhar com desconhecidos.",
+                "fala": "O que você quer? Nós já nos conhecemos?",
                 "respostas": {
-                    "Fico na retaguarda e não atrapalho. Sei seguir ordens.": {"pontuacao": 0.6, "next_id": "2_positiva"},
-                    "Desconfiada assim não vai longe. Precisa de ajuda ou não?": {"pontuacao": -0.5, "next_id": "2_negativa"},
-                    "Depende. O que você está caçando exatamente?": {"pontuacao": 0.2, "next_id": "2_neutra"},
-                    "Não tenho tempo pra caçadora paranoica.": {"pontuacao": -1.0, "next_id": "end_negativo"}
+                    "Só estou de passagem.": {"pontuacao": 0.6, "next_id": "rota_1"},
+                    "#11 Você é uma caçadora? Os monstros da região parecem": {"pontuacao": 0.6, "next_id": "rota_secreta"},
                 }
             },
-            "2_positiva": {
-                "fala": "Bom. Disciplina é rara. Estou rastreando um javali corrompido. Forte, rápido… e esperto demais.",
-                "respostas": {
-                    "Posso distrair a fera enquanto você finaliza.": {"pontuacao": 0.7, "next_id": "end_positivo"},
-                    "Consigo montar uma emboscada com o terreno.": {"pontuacao": 0.4, "next_id": "3_positiva"},
-                    "Só entro se ficar com as presas do javali.": {"pontuacao": -0.3, "next_id": "2_negativa"}
-                }
-            },
-            "2_negativa": {
-                "fala": "Cuidado com o tom. A última pessoa que me provocou virou isca.",
-                "respostas": {
-                    "Não foi minha intenção. Vamos focar na caçada.": {"pontuacao": 0.3, "next_id": "3_neutra"},
-                    "Ameaças não funcionam comigo.": {"pontuacao": -0.7, "next_id": "end_negativo"},
-                    "Então me diga o plano e eu ajudo.": {"pontuacao": 0.1, "next_id": "2_neutra"}
-                }
-            },
-            "2_neutra": {
-                "fala": "Um javali desses rende bem. A vila paga 30 moedas… se voltarmos vivos.",
-                "respostas": {
-                    "Fechado. Vamos fazer isso direito.": {"pontuacao": 0.4, "next_id": "end_positivo"},
-                    "Quero 60 moedas e a liderança.": {"pontuacao": -0.2, "next_id": "3_neutra"},
-                    "Arriscado demais pra mim.": {"pontuacao": -0.5, "next_id": "end_negativo"}
-                }
-            },
-            "3_positiva": {
-                "fala": "Você pensa antes de agir. Gosto disso. Volte quando quiser caçar de verdade.",
-                "respostas": {
-                    "Estarei por perto. Boa caça.": {"pontuacao": 0.4, "next_id": "end_positivo"}
-                }
-            },
-            "3_neutra": {
-                "fala": "Não confio fácil, mas aceito o acordo. Não me faça arrepender.",
-                "respostas": {
-                    "Sem promessas vazias. Só resultados.": {"pontuacao": 0.0, "next_id": "end_neutro"}
-                }
-            },
-            "end_positivo": {
-                "fala": "Você sobreviveu… e ajudou. Isso já te coloca acima da maioria. A vila vai lembrar do seu nome.",
-                "respostas": {}
-            },
-            "end_negativo": {
-                "fala": "Suma das minhas trilhas antes que vire parte da paisagem.",
-                "respostas": {}
-            },
-            "end_neutro": {
-                "fala": "Acordo cumprido. Nada mais, nada menos.",
-                "respostas": {}
-            }
+            
         }
         
-        self.max_hp = randint(20,30)
         self.attack_damage = randint(12,20)
+        self.soube_ataque = False
 
 class Obi(Villager):
     def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Nina", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[]):
@@ -1621,84 +1341,213 @@ class Rose(Villager):
         }
 
 class Holz(Villager):
-    def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Nina", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[]):
+    def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Nina", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[], player=None):
         arvore_1 = (5217,2837)
         arvore_2 = (5533,1566)
         arvore_3 = (4564, 1294)
         arvore_4 = (5158, 1084)
         self.arvores = [arvore_1, arvore_2, arvore_3, arvore_4]
         self.arvore_escolhida = None
-        
+
         super().__init__(*groups, collision_sprites=collision_sprites, creatures_sprites=creatures_sprites, npc_name=npc_name, house_point=house_point, is_ranged=is_ranged, attack_hitbox_list=attack_hitbox_list, range_distance=range_distance, default_size=default_size, team_members=team_members, original_speed=original_speed, actions_to_add=actions_to_add)
 
+        self.player = player
+        self.hp = 30
+        self.max_hp=30
         self.talks = {
             "1": {  # Introdução
-                "fala": "Cuidado onde pisa. Um golpe errado de machado e ninguém volta inteiro pra casa. Sou Holz… corto lenha pra vila desde antes de você aparecer.",
+                "fala": "Você com certeza está perdido viajante! Ho ho ho... É raro ver andarilhos por aqui tão perto do início das nevascas. Se não for embora logo vai ser obrigado a passar o resto do inverno aqui no vale.",
                 "respostas": {
-                    "Só estou observando. Não quero atrapalhar.": {"pontuacao": 0.4, "next_id": "2_neutra"},
-                    "Posso ajudar com o trabalho, se quiser.": {"pontuacao": 0.6, "next_id": "2_positiva"},
-                    "Trabalho pesado pra pouca recompensa, não acha?": {"pontuacao": -0.4, "next_id": "2_negativa"},
-                    "Sai da frente, tenho coisas mais importantes.": {"pontuacao": -1.0, "next_id": "end_negativo"}
+                    "Passar o inverno aqui na vila não parece tão ruim. Isso seria um problema?": {"pontuacao": 0.4, "next_id": "rota_1"},
+                    "Não estava sabendo disso. Pode me dizer quando as nevascas devem começar?": {"pontuacao": 0.6, "next_id": "rota_2"},
+                    "#4 Você deve ser o Holz, certo?": {"pontuacao": -0.4, "next_id": "rota_secreta"},
                 }
             },
-            "2_positiva": {
-                "fala": "Ajuda sempre é bem-vinda. As florestas andam estranhas… árvores caindo sozinhas, bichos fugindo do nada.",
+            "rota_secreta": {  
+                "fala": "Olha só... Se sabe meu nome então talvez não esteja tão perdido assim. Como me conhece?",
                 "respostas": {
-                    "Posso vigiar enquanto você corta.": {"pontuacao": 0.5, "next_id": "3_positiva"},
-                    "Se algo atacar, eu seguro a criatura.": {"pontuacao": 0.7, "next_id": "end_positivo"},
-                    "Só se dividir o pagamento.": {"pontuacao": -0.3, "next_id": "2_neutra"}
+                    "Encontrei sua filha nas montanhas. Ela ia ser atacada por alguns monstros e eu dei uma força.": {"pontuacao": 0.4, "next_id": "end_secreto"},
                 }
             },
-            "2_neutra": {
-                "fala": "Observar é melhor que atrapalhar. Se ficar, mantenha distância do machado.",
+            "rota_2": {  
+                "fala": "Cada osso do meu corpo me diz que amanhã mesmo as primeiras neves já devem começar a cair",
                 "respostas": {
-                    "Entendido. Segurança primeiro.": {"pontuacao": 0.3, "next_id": "3_neutra"},
-                    "Já vi coisa pior.": {"pontuacao": -0.2, "next_id": "2_negativa"},
-                    "Vou seguir meu caminho então.": {"pontuacao": -0.4, "next_id": "end_negativo"}
+                    "Se as nevascas estão tão próximas assim, talvez tenha alguma trabalho com o qual eu possa ajudar para ganhar alguns favores em troca.": {"pontuacao": 0.4, "next_id": "end_5"},
+                    "Entendo. Melhor eu resolver logo minhas questões então! Muito obrigado amigo!": {"pontuacao": 0.6, "next_id": "end_4"},
                 }
             },
-            "2_negativa": {
-                "fala": "Pouca recompensa? Essa lenha aquece crianças e mantém a vila de pé.",
+            "rota_1": {  
+                "fala": "Isso você deve perguntar ao chefe da vila. Mas cá entre nós, tivemos uma excelente temporada de caça e os celeiros estão cheios! Não deve ser problema ho ho ho...",
                 "respostas": {
-                    "Não quis desrespeitar. Me expressei mal.": {"pontuacao": 0.3, "next_id": "3_neutra"},
-                    "Cada um escolhe o peso que carrega.": {"pontuacao": -0.6, "next_id": "end_negativo"},
-                    "O que anda acontecendo na floresta?": {"pontuacao": 0.1, "next_id": "2_neutra"}
+                    "Posso usar seu nome como referência quando eu falar com o chefe?": {"pontuacao": 0.4, "next_id": "end_1"},
+                    "É normal os celeiros estarem tão cheios assim?": {"pontuacao": 0.6, "next_id": "rota_1_2"},
                 }
             },
-            "3_positiva": {
-                "fala": "Você não foge do trabalho duro. Gosto disso. A vila precisa de gente assim.",
+            "rota_1_2": {  
+                "fala": "Uma praga se espalhou pela tribo dos orcs durante a temporada de coleta. Não foi nada tão letal, mas poucos deles estavam em condições de  juntar recursos então conseguimos coletar mais que o normal.",
                 "respostas": {
-                    "Faço o que precisa ser feito.": {"pontuacao": 0.4, "next_id": "end_positivo"}
+                    "Mas isso quer dizer que os Orcs não tem recursos pra passar essa temporada de nevascas, certo?": {"pontuacao": 0.4, "next_id": "rota_1_3"},
+                    "Pelo que você está falando, parece que o destino decidiu qual raça deve viver ou morrer": {"pontuacao": 0.6, "next_id": "end_2"},
                 }
             },
-            "3_neutra": {
-                "fala": "Não confio fácil, mas você não parece problema.",
+            "rota_1_2": {  
+                "fala": "Só podemos nos preocupar com a presa que estamos caçando. Lamento por eles, mas isso não é problema nosso.",
                 "respostas": {
-                    "Já é um começo.": {"pontuacao": 0.0, "next_id": "end_neutro"}
+                    "Tem razão. Talvez eles mereçam o que está acontecendo.": {"pontuacao": 0.4, "next_id": "end_2"},
+                    "Eu entendo o que você quer dizer amigo,  mas quando uma criatura está encurralada é quando ela é mais perigosa, pois não tem nada a perder.": {"pontuacao": 0.6, "next_id": "rota_1_4"},
                 }
             },
-            "end_positivo": {
-                "fala": "Se precisar de lenha, abrigo ou uma mão firme… me procure. Você é amigo da vila.",
+            "rota_1_4": {  
+                "fala": "Está dizendo pra darmos as mãos com os monstros e abraçarmos uma árvore?",
+                "respostas": {
+                    "Não exatamente...": {"pontuacao": 0.4, "next_id": "end_3"},
+                    "É quase isso": {"pontuacao": 0.6, "next_id": "end_3"},
+                }
+            },
+            "end_1": {  
+                "fala": "O que? Nunca! Que tipo de pessoa pede favores a um desconhecido sem oferecer algo em troca? Eu não confio em pessoas que agem assim.",
                 "respostas": {}
             },
-            "end_negativo": {
-                "fala": "Vai. Antes que eu diga algo que não possa desfazer.",
+            "end_2": {  
+                "fala": "Cuidado viajante, a natureza pode ter sido gentil conosco essa temporada, mas na próxima podemos ser nós os que estarão passando fome.",
                 "respostas": {}
             },
-            "end_neutro": {
-                "fala": "Cada um segue seu caminho. O meu começa antes do amanhecer.",
+            "end_3": {  
+                "fala": "Olha garoto, não vou dizer que não entendo o que você está falando, mas não tem como falar com essas coisas. E é melhor você nem tentar, senão vai só morrer por nada.",
                 "respostas": {}
-            }
+            },
+            "end_4": {  
+                "fala": "Boa sorte, Viajante! Fale com o chefe da vila se precisar de algo.",
+                "respostas": {}
+            },
+            "end_5": {  
+                "fala": "Muito bem! Gosto de pessoas que não tem medo de trabalhar pesado! Os Monstros hoje estão bem agitados. Me proteja enquanto eu corto a próxima árvore e fico te devendo uma.",
+                "respostas": {}
+            },
+            "end_secreto": {  
+                "fala": "O que? Se está falando a verdade eu tenho uma dívida eterna com você, rapaz. Se precisar de qualquer coisa é só me falar.",
+                "respostas": {}
+            },
+
+
+
+
+            "end_6": {  
+                "fala": "Olha só! Você realmente me protegeu! Fico te devendo muito com isso, meu amigo. Se precisar de qualquer coisa na vila, pode contar comigo.",
+                "respostas": {}
+            },
+            "end_7": {  
+                "fala": "Você realmente não é confiável Vá embora daqui!",
+                "respostas": {}
+            },
+
+
+
+
         }
 
+        self.talks_tarde = {
+            "1": { 
+                "fala": "Viajante, você viu minha filha? Ela sempre vai para as montanhas durante a manhã, mas até agora ela não voltou.",
+                "respostas": {
+                    "Não a vi senhor. Sinto muito.": {"pontuacao": 0.6, "next_id": "end_secreto_naovi"},
+                    "#5 É uma jovem ruiva, não é? Já a encontrei nas montanhas. Parecia estar tudo bem com ela.": {"pontuacao": 0.4, "next_id": "end_secreto_ok"},
+                }
+            },
+            "end_secreto_ok": { 
+                "fala": "É mesmo? Se está tudo bem com ela então acho que não preciso me preocupar",
+                "respostas": {}
+            },
+            "end_secreto_naovi": {  # Introdução
+                "fala": "Entendo... Talvez seja melhor eu ir dar uma olhada",
+                "respostas": {}
+            },
+        }
+
+        self.talks_viu_nina_morta = {
+            "1_morta": {  # Introdução
+                "fala": "Minha pequena...",
+                "respostas": {}
+            },
+        }
         self.max_hp = randint(20,30)
         self.attack_damage = randint(12,20)
-
+        self.espera_ajuda_player = False
         self.tree_group = pygame.sprite.Group()
+        self.foi_atingido = False
+        self.cortou_uma_arvore = False
+        self.ir_procurar_nina = False
+        self.NINA = None
         for sp in self.collision_sprites:
             if hasattr(sp, "is_tree") and sp.is_tree:
                 sp.add(self.tree_group)
-        print(self.tree_group)
+       
+    def handle_damage(self, damage, impact_slide = False, impact_slide_strength = 50, attacking_character=None):
+        initial_hp = self.hp
+        damaged =  super().handle_damage(damage, impact_slide, impact_slide_strength, attacking_character)
+        actual_hp = self.hp
+        if actual_hp < initial_hp and self.espera_ajuda_player:
+            self.foi_atingido = True
+
+        return damaged
+    def escolhe_fala(self, ):
+        hora = self.get_hour()
+        self.player.falou_holz = True
+
+        if hora > 12 and not self.player.salvou_nina:
+            if self.NINA.is_dead and (self.position_vector - self.NINA.position_vector).length() < WINDOW_WIDTH//4:
+                self.talks = self.talks_viu_nina_morta
+            else:
+                self.talks = self.talks_tarde
+            
+            if self.current_id not in list(self.talks.keys()):
+                self.current_id = list(self.talks.keys())[0]
+            fala_data = self.talks.get(self.current_id)
+            if not fala_data:
+                return "", []
+            
+            if self.current_id == "end_secreto_naovi":
+                self.ir_procurar_nina = True
+            
+            fala_data = self.talks.get(self.current_id)
+            # Verifica se é fim (sem respostas) e aplica reputação
+            if not fala_data["respostas"]:
+                delta_rep = self.pontuacao * 20  # Exemplo: pontuação alta -> +rep, baixa -> -rep
+                return fala_data["fala"], []  # Mostra fala final e encerra
+
+            respostas = self.player.verifica_respostas(list(fala_data["respostas"].keys()))
+            print(f"Respostas: {respostas}")
+            return fala_data["fala"], respostas
+
+        else:
+
+            fala_data = self.talks.get(self.current_id)
+            if not fala_data:
+                return "", []
+            
+            if self.current_id == "end_5":
+                self.espera_ajuda_player = True
+                if self.cortou_uma_arvore:
+                    self.espera_ajuda_player = False
+                    self.current_id = "end_6"
+                    self.player.tem_apoio_holz = True
+                elif self.foi_atingido:
+                    self.espera_ajuda_player = False
+                    self.current_id = "end_7"
+
+            
+            if self.current_id == "end_secreto":
+                self.player.tem_apoio_holz = True
+
+            fala_data = self.talks.get(self.current_id)
+            # Verifica se é fim (sem respostas) e aplica reputação
+            if not fala_data["respostas"]:
+                delta_rep = self.pontuacao * 20  # Exemplo: pontuação alta -> +rep, baixa -> -rep
+                return fala_data["fala"], []  # Mostra fala final e encerra
+            
+            respostas = self.player.verifica_respostas(list(fala_data["respostas"].keys()))
+            return fala_data["fala"], respostas
+    
 
 class Sammy(Villager):
     def __init__(self, *groups, collision_sprites, creatures_sprites, npc_name="Sammy", house_point=(0, 0), is_ranged=False, attack_hitbox_list={ "Front": (150, 70),"Back": (150, 70),"Left": (70, 150),"Right": (70, 150) }, range_distance=36, default_size=HDCS + HHDCS, team_members=[], original_speed = 200, actions_to_add=[], initial_position:set=()):

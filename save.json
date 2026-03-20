@@ -1,3 +1,10 @@
 {
-    "loop": 4
+    "loop": 7,
+    "viu_corpo_nina": true,
+    "sabe_movimentacao_orcs": false,
+    "sabe_nome_nina": false,
+    "tem_apoio_holz": false,
+    "salvou_nina": false,
+    "falou_nina": false,
+    "falou_holz": false
 }

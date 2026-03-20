@@ -390,7 +390,8 @@ class Game:
                                 exibir_tutorial = False
                                 self.game_running = False
                         pygame.display.flip()
-                                
+
+                self.player.le_infos_loop()             
                 light_sprites = [sp for sp in self.all_sprites if hasattr(sp, "has_light")]
                 
                 #NEVE
@@ -422,10 +423,9 @@ class Game:
                     
                     now = pygame.time.get_ticks()
                     if self.player.is_dead and self.player.death_time and now - self.player.death_time > 4000:
+                        self.player.salva_infos_loop()
                         if self.player.loop == 1:
                             som_loop()
-                        if not self.contou_loop:
-                            self.player.define_loop()
                         
                         self.contou_loop=False
 
@@ -462,25 +462,7 @@ class Game:
 
                     #CONQUISTAS DE LOOP
                     loop = self.player.loop
-                    if loop == 1 and passou_18h and esta_vila and not self.contou_loop :
-                        som_loop()
-                        self.contou_loop = True
-                        self.player.define_loop()
-
-                    elif loop == 2 and not self.contou_loop and self.player.falou_orc_caido:
-                        som_loop()
-                        self.contou_loop = True
-                        self.player.define_loop()
-
-                    elif loop == 3 and not self.contou_loop and self.player.falou_chefe_vila:
-                        som_loop()
-                        self.contou_loop = True
-                        self.player.define_loop()
-
-                    elif loop == 4 and not self.contou_loop and self.player.falou_orc_caido and self.player.falou_chefe_orcs:
-                        som_loop()
-                        self.contou_loop = True
-                        self.player.define_loop()
+                    
 
                     if passou_18h and self.background_music != self.battle_music:
                         self.changing_music = True
@@ -646,10 +628,11 @@ class Game:
                         if creat.is_dead:
                             continue
                         
-                        
+                        if creat.personal_name == "Nash":
+                            print(f"HP da NASH: {creat.max_hp}")
                         # Configurações da barra de vida
-                        bar_width = 160
-                        bar_height = 14
+                        bar_width = 160 
+                        bar_height = 14 
                         
                         # Posição acima do personagem
                         bar_x = creat.hitbox.centerx - bar_width // 2 + offset.x
@@ -860,7 +843,7 @@ class Game:
                         fade.fill((255, 255, 255, int(alpha)))
 
                         self.screen.blit(fade, (0, 0))
-                        opcao_escolhida = show_modal(self.screen,font=game_defaul_font, main_text=self.player.frases_loops[self.player.loop], options=[], max_width=800, chat_end=elapsed < DURATION, )
+                        # opcao_escolhida = show_modal(self.screen,font=game_defaul_font, main_text=self.player.frases_loops[self.player.loop], options=[], max_width=800, chat_end=elapsed < DURATION, )
 
                     
 
@@ -914,22 +897,25 @@ class Game:
         )
 
 
+
         #village infos
         self.human_village_rect = pygame.Rect(3800,1400,2200, 2000)
         self.orcs_village_rect = pygame.Rect(360,4358,1500, 1500)
         self.human_pits = [(5528, 2200), (4618, 2836), (4481, 2000) ]
         nina = Nina(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, default_size=DCS-HHDCS - HHHDCS, player=self.player)
+        self.player.nina = nina
         alav = PessoaAlavanca(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, default_size=DCS-HHDCS - HHHDCS, player=self.player)
         alav.player = self.player
         # Obi
         obi = Obi(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Obi")
         self.char_monitored = obi
-        dash = Dash(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Dash", is_ranged=True, attack_hitbox_list={"Front": (0,0), "Back": (0,0), "Left": (0,0), "Right": (0,0)}, range_distance=550)
+        dash = Dash(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Dash", is_ranged=True, attack_hitbox_list={"Front": (0,0), "Back": (0,0), "Left": (0,0), "Right": (0,0)}, range_distance=550, player=self.player)
         nash = Nash(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Nash", is_ranged=False, default_size=HDCS +HHDCS - 5, team_members=[dash,], attack_hitbox_list={"Front": (150,70), "Back": (150,70), "Left": (130,70), "Right": (130,70),})
         dash.team_members = [nash,]
 
         rose = Rose(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Rose", is_ranged=False, default_size=HDCS +HHDCS - 7, original_speed=120, actions_to_add=["SpellCast",])
-        holz = Holz(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Holz", is_ranged=False, default_size=HDCS +HHDCS + 7, )
+        holz = Holz(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Holz", is_ranged=False, default_size=HDCS +HHDCS + 7, player=self.player)
+        holz.NINA = nina
         Fischerin = Villager(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Fischerin", is_ranged=False, default_size=HDCS +HHDCS -3,actions_to_add=["Fishing",] )
         verant = Verant(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Verant", is_ranged=False, default_size=HDCS +HHDCS -3,player=self.player, )
         verloren = Verloren(self.all_sprites, self.player_group,self.creatures, collision_sprites=self.collision_sprites, creatures_sprites=self.creatures, npc_name="Verloren", is_ranged=False, default_size=HDCS +HHDCS,player=self.player, )
@@ -963,7 +949,7 @@ class Game:
         inicio = perf_counter()
         monster_path = join(getcwd(), "Ecosystem","Winter","Monsters", "Winter Slime",)
         slime_images = load_character_images(monster_path, False)
-        for i in range(0,20):
+        for i in range(0,10):
             initial_position = choice(spawn_points)
             slime = Slime(self.all_sprites, collision_sprites=self.collision_sprites, initial_position=initial_position, creatures_sprites=self.creatures, creature_images=slime_images)
             self.creatures.add(slime)
@@ -977,7 +963,7 @@ class Game:
 
         monster_path = join(getcwd(), "Ecosystem","Winter","Monsters", "Orc do Gelo",)
         creature_images = load_character_images(monster_path, False)
-        for i in range(0,10):
+        for i in range(0,5):
             initial_position = choice(spawn_points)
             orc_cacador = OrcCacador(self.all_sprites, collision_sprites=self.collision_sprites, initial_position=initial_position, creatures_sprites=self.creatures,creature_images=[] )
             self.creatures.add(orc_cacador)

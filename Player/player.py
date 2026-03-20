@@ -3,6 +3,8 @@ from Utils.classes_raiz import Character,Mimetizacao
 from Utils.villagers import Dash
 from Utils.speels import *
 from Utils.effects import Blind
+import re
+
 class Player(Character):
     def __init__(self, *groups, collision_sprites:pygame.sprite.Group,creatures_sprites:pygame.sprite.Group):
         super().__init__(*groups, collision_sprites=collision_sprites, creatures_sprites=creatures_sprites, is_player=True)
@@ -27,8 +29,9 @@ class Player(Character):
         
         self.image = pygame.transform.scale(self.frames[self.action][self.state][0], (self.default_size, self.default_size))
         self.rect = self.image.get_frect(center = (5000, 3000))
-        self.rect = self.image.get_frect(center = (2369.525390625, 97.13313293457031))
+        # self.rect = self.image.get_frect(center = (2369.525390625, 750.13313293457031))
         # self.rect = self.image.get_frect(center = (5866, 5918))
+        # self.rect = self.image.get_frect(center = (3239, 5888))
         self.hitbox = pygame.FRect(
             self.rect.left + self.rect.width/2,
             self.rect.top + self.rect.height/3+50,
@@ -124,6 +127,16 @@ class Player(Character):
             4: "Eu entendo que essas pessoas estão com problemas, mas esse problema não é meu."
         }
 
+        #DIALOGOS DESBLOQUEAVEIS
+        self.nina = None
+        self.viu_corpo_nina = False #1
+        self.sabe_movimentacao_orcs = False #2
+        self.sabe_nome_nina = False #3
+        self.tem_apoio_holz = False #4
+        self.salvou_nina = False
+        self.falou_nina = False
+        self.falou_holz = False
+
     @property
     def speed(self):
         mult = min(1, 1.0 - (1 - self.hp/self.max_hp))
@@ -173,38 +186,64 @@ class Player(Character):
         self.transformations = transformations
 
 
-    def salva_infos_loop(self, new_loop):
+    def salva_infos_loop(self,):
+        self.loop += 1 
         dados = {
-            "loop": new_loop,
+            "loop": self.loop,
+            "viu_corpo_nina": self.viu_corpo_nina,
+            "sabe_movimentacao_orcs": self.sabe_movimentacao_orcs,
+            "sabe_nome_nina": self.sabe_nome_nina,
+            "tem_apoio_holz": self.tem_apoio_holz,
+            "salvou_nina": self.salvou_nina,
+            "falou_nina": self.falou_nina,
+            "falou_holz": self.falou_holz,
         }
 
         with open(join(getcwd(), "save.json"), "w", encoding="utf-8") as f:
             dump(dados, f, ensure_ascii=False, indent=4)
 
-    def le_infos_loop(self) -> int:
-        with open(join(getcwd(),"save.json"), "r", encoding="utf-8") as f:
-            loop = load(f)["loop"]
-        return loop
 
-    def define_loop(self):
-        if self.loop == 1:
-            self.salva_infos_loop(2)
-        
-        elif self.loop == 2:
-            if self.falou_orc_caido:
-                self.salva_infos_loop(3)
-        
-        elif self.loop == 3:
-            if self.falou_chefe_vila:
-                self.salva_infos_loop(4)
+    def le_infos_loop(self):
+        with open(join(getcwd(), "save.json"), "r", encoding="utf-8") as f:
+            dados = load(f)
 
-        elif self.loop == 4:
-            if self.falou_orc_caido and self.falou_chefe_orcs:
-                self.salva_infos_loop(5)
+        for chave, valor in dados.items():
+            setattr(self, chave, valor)
 
+        return self.loop
+
+    def handle_conditions(self,):
+        if not self.viu_corpo_nina and self.nina.is_dead and (pygame.Vector2(self.nina.rect.center) - pygame.Vector2(self.rect.center)).length() < WINDOW_WIDTH//2:
+            self.viu_corpo_nina = True
+
+    def verifica_respostas(self, respostas:list):
+        respostas_permitidas = []
+        for resposta in respostas:
+            match = re.match(r"^#(\d+)", resposta)
+
+            if match:
+                
+                numero = int(match.group(1))
+                if numero == 1 and self.viu_corpo_nina:
+                    respostas_permitidas.append(re.sub(r"^#(\d+)", "", resposta))
+                if numero == 2 and self.sabe_movimentacao_orcs:
+                    respostas_permitidas.append(re.sub(r"^#(\d+)", "", resposta))
+                if numero == 3 and self.sabe_nome_nina:
+                    respostas_permitidas.append(re.sub(r"^#(\d+)", "", resposta))
+                if numero == 4 and self.sabe_nome_nina:
+                    respostas_permitidas.append(re.sub(r"^#(\d+)", "", resposta))
+                if numero == 5 and self.sabe_nome_nina:
+                    respostas_permitidas.append(re.sub(r"^#(\d+)", "", resposta))
+                if numero == 7 and self.falou_nina or self.falou_holz:
+                    respostas_permitidas.append(re.sub(r"^#(\d+)", "", resposta))
+            else:
+                respostas_permitidas.append(resposta)
+        return respostas_permitidas
     def update(self, dt):
         if not self.handle_states(dt):
             return
+        
+        self.handle_conditions()
         
         self.now = pygame.time.get_ticks()
         self.list_transformations()
